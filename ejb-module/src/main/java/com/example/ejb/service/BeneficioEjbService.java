@@ -46,8 +46,6 @@ public class BeneficioEjbService {
         } catch (OptimisticLockException ole) {
             throw new EJBException("A transferência não pôde ser concluída devido a uma modificação simultânea." +
                     " Tente novamente.", ole);
-        } catch (Exception e) {
-            throw new EJBException("Erro na transferência" + e.getMessage(), e);
         }
 
     }
