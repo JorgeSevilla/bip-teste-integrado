@@ -6,8 +6,10 @@ import jakarta.ejb.EJB;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.*;
 
 @CrossOrigin
@@ -33,10 +35,18 @@ public class BeneficioController {
     }
 
     @PostMapping
-    public Beneficio criar(@Valid @RequestBody Beneficio beneficio) {
+    public ResponseEntity<Beneficio> criar(@Valid @RequestBody Beneficio beneficio) {
         beneficio.setId(null);
         beneficio.setVersion(null);
-        return beneficioService.create(beneficio);
+
+        Beneficio beneficioCriado = beneficioService.create(beneficio);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("{id}")
+                .buildAndExpand(beneficioCriado.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(beneficioCriado);
     }
 
     @PutMapping("/{id}")
