@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.ejb.model.Beneficio;
 import com.example.ejb.service.BeneficioEjbService;
 import jakarta.ejb.EJB;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,30 +33,24 @@ public class BeneficioController {
     }
 
     @PostMapping
-    public Beneficio criar(@RequestBody Beneficio beneficio) {
+    public Beneficio criar(@Valid @RequestBody Beneficio beneficio) {
         beneficio.setId(null);
         beneficio.setVersion(null);
         return beneficioService.create(beneficio);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Beneficio> atualizar(@PathVariable Long id, @RequestBody Beneficio beneficioData) {
-        try {
-            Beneficio atualizado = beneficioService.update(id, beneficioData);
-            return ResponseEntity.ok(atualizado);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Beneficio> atualizar(@PathVariable Long id, @Valid @RequestBody Beneficio beneficioData) {
+        Beneficio atualizado = beneficioService.update(id, beneficioData);
+        return ResponseEntity.ok(atualizado);
+
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        try {
-            beneficioService.delete(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        beneficioService.delete(id);
+        return ResponseEntity.noContent().build();
+
     }
 
     public static record TransferenciaRequest(Long fromId, Long toId, BigDecimal amount) {
@@ -63,13 +58,8 @@ public class BeneficioController {
 
     @PostMapping("/transferir")
     public ResponseEntity<String> transferir(@RequestBody TransferenciaRequest request) {
-        try {
-            beneficioService.transfer(request.fromId(), request.toId(), request.amount());
+        beneficioService.transfer(request.fromId(), request.toId(), request.amount());
 
-            return ResponseEntity.ok("Transferência completada com sucesso.");
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Erro na transferência: " + e.getMessage());
-        }
+        return ResponseEntity.ok("Transferência completada com sucesso.");
     }
 }
